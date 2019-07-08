@@ -6,7 +6,8 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      .container { display: flex; justify-content: space-around}
+      form { background: #000; padding: 3px; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
@@ -15,10 +16,18 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class="container">
+      <div class="console">
+        <ul id="messages"></ul>
+        <form action="">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+      </div>
+      <div class="painel">
+        <button class='getClients'>atualizar</button>
+        <select id="clients"></select>
+      </div>
+    </div>
   </body>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -26,6 +35,23 @@
 <script>
   $(function () {
       var socket = io();
+
+      function getClients() {
+          socket.emit('getClients');
+          socket.on('clients', function(clients){
+              $('#clients').empty();
+              clients.forEach(function(c) {
+                  $('#clients').append($('<option>').text(c));
+              })
+          });
+      }
+
+      getClients();
+
+      $('.getClients').click(function(e) {
+          e.preventDefault();
+          getClients();
+      })
 
       $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
@@ -39,7 +65,11 @@
 
           if(value === 'down') {
               socket.emit('down');
-          }          
+          }
+
+          if(value === 'sound') {
+              socket.emit('sound');
+          }
           return false;
       });
 
