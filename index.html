@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600" onclick="init();"> </canvas>
+  </body>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    var socket = io();
+
+    var x = 400;
+    var y = 300;
+    var ctx = document.getElementById('canvas').getContext('2d');
+
+    function clear() {
+        ctx.clearRect(0, 0, 800, 600);
+    }
+
+    function ball(x,y) {
+        ctx.beginPath();
+        ctx.arc(x,y,40,0,Math.PI*2,true);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function  draw() {
+        clear();
+        ball(x,y);
+    }
+
+    $(function () {
+
+        $('form').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            var value = $('#m').val()
+            // socket.emit('chat message', $('#m').val());
+            // $('#m').val('');
+            if(val === 'repeat') {
+                socket.emit('repeat');
+            }
+            if(val === 'up') {
+                socket.emit('up');
+            }
+            if(val === 'down') {
+                socket.emit('down');
+            }
+            return false;
+        });
+
+        socket.on('up', function(){
+            y = y - 10;
+            draw();
+        });
+        socket.on('down', function(){
+            y = y + 10;
+            draw();
+        });                  
+    });
+
+    draw();
+    </script>
+</html>
